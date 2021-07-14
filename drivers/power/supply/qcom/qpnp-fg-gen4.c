@@ -2108,15 +2108,18 @@ static int fg_gen4_get_batt_profile(struct fg_dev *fg)
 		} else {
 			pr_err("cmdline of batt profile is not defined, read page0 to reload file\n");
 		}
+        pr_info("xiaomi batt chip romid %.2x %.2x %.2x", chip->ds_romid[0], chip->ds_romid[5] & 0xF0, chip->ds_romid[6]);
 		// the battery is xiaomi's batt; FC code, custom id
 		if ((chip->ds_romid[0] == 0x9F) && ((chip->ds_romid[5] & 0xF0) == 0xF0)
-				&& (chip->ds_romid[6] == 04) && !fg->profile_already_find) {
-			if ((chip->ds_page0[0] == 'C') || (chip->ds_page0[0] == 'V')) {
+				&& (chip->ds_romid[6] == 0x04) && !fg->profile_already_find) {
+            pr_info("xiaomi batt chip page %c", chip->ds_page0[6]);
+			if ((chip->ds_page0[6] == 0x32) || (chip->ds_page0[0] == 'V')) {
+                pr_info("xiaomi batt chip resistance %d", fg->batt_id_ohms/1000);
 				profile_node = of_batterydata_get_best_profile(batt_node,
-						fg->batt_id_ohms / 1000, "j2gybm4n_4780mah");
-			} else if ((chip->ds_page0[0] == 'N') || (chip->ds_page0[0] == 'A')) {
+						fg->batt_id_ohms / 1000, "K11A_FMT_4520mah");
+			} else if ((chip->ds_page0[6] == 0x31) || (chip->ds_page0[0] == 'A')) {
 				profile_node = of_batterydata_get_best_profile(batt_node,
-					fg->batt_id_ohms / 1000, "j2nvtbm4n_4780mah");
+					fg->batt_id_ohms / 1000, "K11A_GY_4520mah");
 			} else if ((chip->ds_page0[0] == 'S') || (chip->ds_page0[0] == 'X')) {
 				if (chip->dt.j3s_batt_profile)
 					profile_node = of_batterydata_get_best_profile(batt_node,
